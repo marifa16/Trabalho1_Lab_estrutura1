@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "estruturas.h": "c",
+        "auxiliar.h": "c",
+        "book_manager.h": "c",
+        "files_manager.h": "c"
+    }
+}

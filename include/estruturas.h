@@ -1,0 +1,50 @@
+#ifndef ESTRUTURAS_H // Se ainda não definimos ESTRUTURAS_H
+
+#define ESTRUTURAS_H // ... Agora definimos ESTRUTURAS_H
+#define books_file "books.csv"
+#define emprestimos_file "emprestimos.csv"
+
+#include <time.h> // Inclui a biblioteca para usar struct tm
+
+typedef enum
+{
+    MAIN_MENU,
+    BOOK_MENU,
+    EMPRESTIMO_MENU,
+    RELATORIO_MENU,
+    SAIR
+} state;
+
+typedef enum
+{
+    FICÇÃO,
+    DIDÁTICO,
+    BIOGRAFIA
+} genero;
+
+typedef enum
+{
+    CONCLUIDO,
+    EM_ANDAMENTO,
+    CANCELADO,
+} status;
+
+typedef struct
+{
+    int id;
+    char title[100];
+    char autor[100];
+    char ISBN[14];
+    genero gen;
+} book;
+
+typedef struct
+{
+    int id;
+    char leitor[100];
+    book livro;
+    struct tm data;
+    status stats;
+} emprestimo;
+
+#endif

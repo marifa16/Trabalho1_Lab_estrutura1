@@ -14,7 +14,7 @@ void create_files()
     setlocale(LC_ALL, "pt_BR.UTF-8"); // Configura o locale para portugues do Brasil com suporte a UTF-8
     struct stat buffer;
 
-    int books_stats = (stat(books_file, &buffer) == 0); // se existe retorna 0
+    int books_stats = (stat("data/", &buffer) == 0); // se existe retorna 0
     int emprestimo_stats = (stat(emprestimos_file, &buffer) == 0);
 
     if (!books_stats) // se não existir então crie

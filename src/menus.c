@@ -8,6 +8,7 @@
 #include "../include/menus.h"
 #include "../include/user_handle.h"
 #include "../include/book_manager.h"
+#include "../include/auxiliar.h"
 
 state temp_state;
 
@@ -51,7 +52,6 @@ state book_menu()
     book temp_book;
     book *ptr_book = &temp_book;
 
-    int id = 0;
     int escolha = 0;
 
     printf("===========================\n"
@@ -71,7 +71,9 @@ state book_menu()
     {
     case 1: // adicionar livro
     {
-
+        printf("===========================\n"
+               "  Cadastro de Novo Livro    \n"
+               "===========================\n");
         if (add_book(ptr_book) != -1)
         {
             create_book(ptr_book);
@@ -83,6 +85,10 @@ state book_menu()
     case 2: // remover um livro
     {
         int count = 0;
+
+        printf("===========================\n"
+               "       Remover livro     \n"
+               "===========================\n");
         book *books = searching_book(&count);
 
         if (count > 0)
@@ -99,18 +105,39 @@ state book_menu()
 
         return BOOK_MENU; // voltar para o módulo livros
     }
-    case 3:
+    case 3: // atualizar um livro
     {
-        int *id;
-        if (upp_book(id) != 1)
+
+        printf("===========================\n"
+               "       Atualizar livro     \n"
+               "===========================\n");
+
+        printf("\nDigite o ID do livro que deseja atualizar: ");
+        int id_upp = 0;
+        scanf("%d", &id_upp);
+        limpar_buffer();
+
+        book aux_book = get_book(id_upp);
+        if (aux_book.id != -1)
         {
-            update_book(id, &temp_book);
-            prinf("\n livro atualizado com sucesso!\n");
+            if (upp_book(&aux_book) == 1) // Se o usuário salvou as alterações
+            {
+                update_book(id_upp, &aux_book);
+            }
+            else
+            {
+                printf("\nAtualização cancelada.\n");
+            }
         }
+        else
+        {
+            printf("Livro de id %d não encontrado\n", id_upp);
+        }
+
         return BOOK_MENU; // voltar para o módulo livros
     }
     case 4:
-        prinf("\n Retornando ao menu principal\n");
+        printf("\n Retornando ao menu principal\n");
         return MAIN_MENU;
     case 5:
         return SAIR;
@@ -120,6 +147,7 @@ state book_menu()
                "Opção inválida.\n"
                "Por favor, escolha dentre as opções disponíveis.\n"
                "===========================\n");
+
         return BOOK_MENU; // Permanece no módulo atual
     }
     }

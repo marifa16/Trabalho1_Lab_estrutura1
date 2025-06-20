@@ -35,7 +35,7 @@ int opcao_menu(int min, int max)
         }
         else
         {
-            msg_02_opcao_invalida();
+            printf("Opção inválida. Tente novamente.\n");
             if (tentativas++ > 5)
             { // Limita o número de tentativas
                 printf("Muitas tentativas inválidas. Retornando ao menu anterior.\n");
@@ -171,18 +171,44 @@ int validar_ISBN(char *texto, size_t tamanho)
     return 1;
 }
 
-
 const char *genero_to_string(genero g)
 {
     switch (g)
     {
-    case FICÇÃO:
+    case FICCAO:
         return "Ficção";
-    case DIDÁTICO:
+    case DIDATICO:
         return "Didático";
     case BIOGRAFIA:
         return "Biografia";
     default:
         return "Desconhecido";
     }
+}
+
+char *strcasestr(const char *haystack, const char *needle)
+{
+    if (!*needle)
+    {
+        return (char *)haystack;
+    }
+    for (; *haystack; haystack++)
+    {
+        if (tolower((unsigned char)*haystack) == tolower((unsigned char)*needle))
+        {
+            const char *h, *n;
+            for (h = haystack, n = needle; *h && *n; h++, n++)
+            {
+                if (tolower((unsigned char)*h) != tolower((unsigned char)*n))
+                {
+                    break;
+                }
+            }
+            if (!*n)
+            {
+                return (char *)haystack;
+            }
+        }
+    }
+    return NULL;
 }

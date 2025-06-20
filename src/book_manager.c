@@ -10,6 +10,8 @@
 #include "../include/auxiliar.h"
 #include "../include/book_manager.h"
 
+
+
 void create_book(book *temp_book)
 {
     int id = get_maior_id(books_file) + 1;
@@ -27,12 +29,10 @@ void create_book(book *temp_book)
 
 void read_book(int id)
 {
-    char linha[512];
-
     FILE *arquivo = fopen(books_file, "r"); // Abre o arquivo para adicionar no final
     if (arquivo == NULL)
     {
-        printf("Erro ao abrir o arquivo '%s' para escrita.\n", books_file);
+        printf("Erro ao abrir o arquivo '%s' para leitura.\n", books_file);
         return;
     }
 
@@ -69,16 +69,62 @@ void read_book(int id)
 
 void update_book(int id, book *temp_book)
 {
-    FILE *arquivo = fopen(books_file, "a"); // Abre o arquivo para adicionar no final
+    FILE *arquivo = fopen(books_file, "r"); // Abre o arquivo para criar uma cópia
     if (arquivo == NULL)
     {
-        printf("Erro ao abrir o arquivo '%s' para escrita.\n", books_file);
-        return -1;
+        printf("Erro ao abrir o arquivo '%s' para leitura.\n", books_file);
+        return;
+    }
+    FILE *temp = fopen("temp.csv", "w");
+    if (!temp)
+    {
+        fclose(arquivo);
+        printf("Erro ao criar arquivo temporario.\n");
+        return;
     }
 
-    fprintf(arquivo, "%d,%s,%s,%s,%s", temp_book->id, temp_book->title, temp_book->autor, temp_book->ISBN, temp_book->gen); // Escreve o novo id
-    fprintf(arquivo, "\n");                                                                                                 // Nova linha
+    char linha[512];
+    int id_atual;
+    int executado = 0; // atualizar ou deletar a linha
+
+    // Copia o cabecalho
+    if (fgets(linha, sizeof(linha), arquivo))
+    {
+        fputs(linha, temp);
+    }
+
+    // Copia as linhas, pulando a que sera deletada
+    while (fgets(linha, sizeof(linha), arquivo))
+    {
+        if (sscanf(linha, "%d,", &id_atual) == 1 && id_atual == id)
+        {
+            // Encontrou a linha para atualizar, escreve os novos dados
+            fprintf(temp, "%d,%s,%s,%s,%d\n",
+                    temp_book->id, temp_book->title, temp_book->autor,
+                    temp_book->ISBN, temp_book->gen);
+            executado = 1;
+        }
+        else
+        {
+            // Copia a linha original para o arquivo temporário
+            fputs(linha, temp);
+        }
+    }
+
     fclose(arquivo);
+    fclose(temp);
+
+    remove(books_file);
+    rename("temp.csv", books_file);
+
+    if (executado)
+    {
+        printf("\nLivro com ID %d foi atualizado com sucesso.\n", id);
+    }
+    else
+    {
+        printf("\nAVISO: Livro com ID %d não foi encontrado para atualização.\n", id);
+    }
 }
 
 void delete_book(int id)
@@ -93,11 +139,9 @@ void delete_book(int id)
     if (!temp)
     {
         fclose(arquivo);
-        printf("Erro ao criar arquivo tempor�rio.\n");
+        printf("Erro ao criar arquivo temporario.\n");
         return;
     }
-
-    book temp_book = {0};
 
     char linha[512];
     int id_atual;
@@ -150,7 +194,7 @@ book *search_books(int search_key, book *target_book, int *matchs)
         return NULL;
     }
 
-    book *found_books = NULL; // Ponteiro do array dinâmico
+    book *temp_books = NULL; // Ponteiro do array dinâmico
     *matchs = 0;
 
     char linha[512];
@@ -187,7 +231,7 @@ book *search_books(int search_key, book *target_book, int *matchs)
                 found = 1;
             break;
         case 5: // Genero
-            if (strcmp(aux_book.gen, target_book->gen) == 0)
+            if (aux_book.gen == target_book->gen)
                 found = 1;
             break;
         }
@@ -196,22 +240,22 @@ book *search_books(int search_key, book *target_book, int *matchs)
         {
             (*matchs)++;
             // Realoca memória para o novo livro encontrado
-            book *temp = realloc(found_books, (*matchs) * sizeof(book));
+            book *temp = realloc(temp_books, (*matchs) * sizeof(book));
             if (temp == NULL)
             {
                 printf("Erro de alocação de memória!\n");
-                free(found_books);
+                free(temp_books);
                 fclose(arquivo);
                 return NULL;
             }
-            found_books = temp;
+            temp_books = temp;
             // Copia o livro encontrado para o final do array dinâmico
-            found_books[(*matchs) - 1] = aux_book;
+            temp_books[(*matchs) - 1] = aux_book;
         }
     }
 
     fclose(arquivo);
-    return found_books; // Retorna o ponteiro para o array de livros
+    return temp_books; // Retorna o ponteiro para o array de livros
 }
 
 void view_books(book *books, int count)
@@ -231,4 +275,37 @@ void view_books(book *books, int count)
         printf("        Autor: %s\n", books[i].autor);
     }
     printf("----------------------------------------\n");
+}
+
+book get_book(int id)
+{
+    book temp_book = {.id = -1}; // Inicia com ID inválido para indicar "não encontrado"
+    FILE *arquivo = fopen(books_file, "r");
+    if (arquivo == NULL)
+    {
+        printf("Erro ao abrir arquivo de livros.\n");
+        return temp_book;
+    }
+
+    char linha[512];
+    fgets(linha, sizeof(linha), arquivo); // Pula cabeçalho
+
+    while (fgets(linha, sizeof(linha), arquivo))
+    {
+        int genero_int;
+        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d",
+                   &temp_book.id, temp_book.title, temp_book.autor, temp_book.ISBN, &genero_int) == 5)
+        {
+            if (temp_book.id == id)
+            {
+                temp_book.gen = (genero)genero_int;
+                fclose(arquivo);
+                return temp_book; // Retorna o livro encontrado
+            }
+        }
+    }
+
+    fclose(arquivo);
+    temp_book.id = -1; // Garante que o ID é inválido se não encontrou
+    return temp_book;
 }

@@ -4,6 +4,7 @@
 
 #include "../include/estruturas.h"    // Inclui o cabeçalho das estruturas
 #include "../include/files_manager.h" // Inclui o cabeçalho do arquivo de gerenciamento de arquivos
+#include "../include/menus.h"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
 
     start_files();
 
-    printf("Bem vindo ao sistema de gerenciamento médico\n"
+    printf("Bem vindo ao sistema de gerenciamento de livros\n"
            "Desenvolvido por:\n"
            "ANDERSON CARLOS DA SILVA MORAIS\n"
            "MARILIA FONSECA ANDRADE\n"

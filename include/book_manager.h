@@ -9,5 +9,6 @@ void update_book(int id, book *temp_book);
 void delete_book(int id);
 book *search_books(int search_key, book *target_book, int *matchs);
 void view_books(book *books, int count);
+book get_book(int id);
 
 #endif

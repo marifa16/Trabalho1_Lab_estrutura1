@@ -1,8 +1,8 @@
 #ifndef ESTRUTURAS_H // Se ainda não definimos ESTRUTURAS_H
 
 #define ESTRUTURAS_H // ... Agora definimos ESTRUTURAS_H
-#define books_file "books.csv"
-#define emprestimos_file "emprestimos.csv"
+#define books_file "data/books.csv"
+#define emprestimos_file "data/emprestimos.csv"
 
 #include <time.h> // Inclui a biblioteca para usar struct tm
 
@@ -17,8 +17,8 @@ typedef enum
 
 typedef enum
 {
-    FICÇÃO,
-    DIDÁTICO,
+    FICCAO,
+    DIDATICO,
     BIOGRAFIA
 } genero;
 

@@ -10,22 +10,20 @@
 
 void create_emprestimo(emprestimo *temp_emprestio)
 {
-    FILE *arquivo = fopen(emprestimos_file, "a"); // Abre o arquivo para adicionar no final
-    if (arquivo == NULL)
-    {
-        printf("Erro ao abrir o arquivo '%s' para escrita.\n", emprestimos_file);
-        return -1;
-    }
+    printf("null");
 }
 
 void read_emprestimo()
 {
+    printf("null");
 }
 
 void update_emprestimo()
 {
+    printf("null");
 }
 
 void delete_emprestimo()
 {
+    printf("null");
 }

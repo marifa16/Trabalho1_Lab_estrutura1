@@ -5,5 +5,6 @@
 
 int add_book(book *temp_book);
 book *searching_book(int *count);
+int upp_book(book *temp_book);
 
 #endif

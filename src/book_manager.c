@@ -10,8 +10,6 @@
 #include "../include/auxiliar.h"
 #include "../include/book_manager.h"
 
-
-
 void create_book(book *temp_book)
 {
     int id = get_maior_id(books_file) + 1;

@@ -45,7 +45,6 @@ int opcao_menu(int min, int max)
     } while (1); // Loop até obter uma entrada válida ou exceder tentativas
 }
 
-// Retorna o maior id da primeira coluna do arquivo CSV
 int get_maior_id(const char *texto_arquivo)
 {
     FILE *arquivo = fopen(texto_arquivo, "r");

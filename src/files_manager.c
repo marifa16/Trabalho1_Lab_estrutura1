@@ -43,6 +43,7 @@ void create_files()
         fclose(arquivo);
     }
 }
+
 void start_files()
 {
     create_files();

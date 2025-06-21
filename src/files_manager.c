@@ -11,10 +11,10 @@
 
 void create_files()
 {
-    setlocale(LC_ALL, "pt_BR.UTF-8"); // Configura o locale para portugues do Brasil com suporte a UTF-8
+    setlocale(LC_ALL, ".UTF8"); // Configura o locale para portugues do Brasil com suporte a UTF-8
     struct stat buffer;
 
-    int books_stats = (stat("data/", &buffer) == 0); // se existe retorna 0
+    int books_stats = (stat(books_file, &buffer) == 0); // se existe retorna 0
     int emprestimo_stats = (stat(emprestimos_file, &buffer) == 0);
 
     if (!books_stats) // se não existir então crie
@@ -26,7 +26,7 @@ void create_files()
             return;
         }
 
-        fprintf(arquivo, "ID, TITULO, AUTOR, ISBN, GENERO\n");
+        fprintf(arquivo, "ID,TITULO,AUTOR,ISBN,GENERO,STATUS\n");
         fclose(arquivo);
     }
 
@@ -39,7 +39,7 @@ void create_files()
             return;
         }
 
-        fprintf(arquivo, "ID, LEITOR, LIVRO, DATA, STATS\n");
+        fprintf(arquivo, "ID,LEITOR,LIVRO,DATA,STATS\n");
         fclose(arquivo);
     }
 }

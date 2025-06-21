@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+
 #include "../include/estruturas.h"
 
 void limpar_buffer()
@@ -13,36 +14,26 @@ void limpar_buffer()
 
 int opcao_menu(int min, int max)
 {
-    char entrada[16];
     int valor;
-    int tentativas = 0; // Para evitar loops infinitos em caso de erro persistente
+    char buffer[100];
 
-    do
+    printf("Escolha uma opcao: ");
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL)
     {
-        printf("Escolha uma opção: ");
-        if (fgets(entrada, sizeof(entrada), stdin) == NULL)
-        {
-            // Tratar erro de leitura, se necessário
-            if (tentativas++ > 5)
-                return -1; // Evitar loop infinito
-            continue;
-        }
-        entrada[strcspn(entrada, "\n")] = '\0'; // Remove o newline
+        return -1; // Erro de leitura
+    }
 
-        if (sscanf(entrada, "%d", &valor) == 1 && valor >= min && valor <= max)
+    // Tenta ler um inteiro da string. Se conseguir e não houver lixo depois, sscanf retorna 1.
+    if (sscanf(buffer, "%d", &valor) == 1)
+    {
+        if (valor >= min && valor <= max)
         {
-            return valor; // Retorna o valor válido
+            return valor; // Sucesso
         }
-        else
-        {
-            printf("Opção inválida. Tente novamente.\n");
-            if (tentativas++ > 5)
-            { // Limita o número de tentativas
-                printf("Muitas tentativas inválidas. Retornando ao menu anterior.\n");
-                return -1; // Ou um valor que indique falha/cancelamento
-            }
-        }
-    } while (1); // Loop até obter uma entrada válida ou exceder tentativas
+    }
+
+    printf("Opcao invalida. Tente novamente.\n");
+    return -1; // Indica falha, para ser tratada em um loop
 }
 
 int get_maior_id(const char *texto_arquivo)
@@ -75,18 +66,27 @@ int get_maior_id(const char *texto_arquivo)
 
 int validar_titulo(char *texto, size_t tamanho)
 {
-    fgets(texto, tamanho, stdin);
-    texto[strcspn(texto, "\n")] = '\0';
+    if (fgets(texto, tamanho, stdin) == NULL)
+        return 0;
+
+    // Se a string lida não contém '\n', significa que a entrada foi maior que o buffer.
+    // Nesse caso, limpamos o restante da entrada para evitar problemas futuros.
+    if (strchr(texto, '\n') == NULL)
+    {
+        limpar_buffer();
+    }
+    else
+    {
+        // Se a entrada coube, apenas removemos o '\n' do final.
+        texto[strcspn(texto, "\n\r")] = 0;
+    }
 
     if (strlen(texto) == 0)
     {
         printf("O titulo não pode estar vazio.\n");
-        // Se a entrada foi apenas '\n', o buffer de stdin está limpo.
-        // Se a entrada foi "  \n" e texto ficou "", buffer limpo.
-        // Se a entrada foi muito longa, o '\n' e o resto ficaram.
-        limpar_buffer();
         return 0;
     }
+
     // Adicional: verificar se o texto não é composto apenas de espaços
     int so_espacos = 1;
     for (size_t i = 0; i < strlen(texto); i++)
@@ -97,7 +97,7 @@ int validar_titulo(char *texto, size_t tamanho)
             break;
         }
     }
-    if (so_espacos && strlen(texto) > 0)
+    if (so_espacos)
     {
         printf("O titulo não pode estar vazio.\n");
         return 0;
@@ -108,15 +108,27 @@ int validar_titulo(char *texto, size_t tamanho)
 
 int validar_autor(char *texto, size_t tamanho)
 {
-    fgets(texto, tamanho, stdin);
-    texto[strcspn(texto, "\n")] = '\0';
+    if (fgets(texto, tamanho, stdin) == NULL)
+        return 0;
+
+    // Se a string lida não contém '\n', significa que a entrada foi maior que o buffer.
+    // Nesse caso, limpamos o restante da entrada para evitar problemas futuros.
+    if (strchr(texto, '\n') == NULL)
+    {
+        limpar_buffer();
+    }
+    else
+    {
+        // Se a entrada coube, apenas removemos o '\n' do final.
+        texto[strcspn(texto, "\n\r")] = 0;
+    }
 
     if (strlen(texto) == 0)
     {
         printf("O nome do autor não pode estar vazio.\n");
-        limpar_buffer();
         return 0;
     }
+
     for (size_t i = 0; i < strlen(texto); i++) // funcao strlen retorna um tipo size_t, para evitar problema de comparar um unsigned com um int normal
     {
         if (isdigit((unsigned char)texto[i])) // acessa o caractere, realiza um cast para unsigned char, pois a bib ctype espera um int, verifica se é um digito (0-9), se for entra no laço
@@ -134,6 +146,7 @@ int validar_autor(char *texto, size_t tamanho)
             break;
         }
     }
+
     if (so_espacos)
     {
         printf("O nome do autor não pode conter apenas espaços.\n");
@@ -144,18 +157,19 @@ int validar_autor(char *texto, size_t tamanho)
 
 int validar_ISBN(char *texto, size_t tamanho)
 {
-    fgets(texto, tamanho, stdin);
-    texto[strcspn(texto, "\n")] = '\0';
-
-    if (strlen(texto) != 13)
-    {
-        printf("Erro: O ISBN deve conter exatamente 13 dígitos.\n");
-        // Se a entrada foi maior que o buffer, o resto precisa ser limpo
-        if (strlen(texto) == tamanho - 1)
-        {
-            limpar_buffer();
-        }
+    if (fgets(texto, tamanho, stdin) == NULL)
         return 0;
+
+    // Se a string lida não contém '\n', significa que a entrada foi maior que o buffer.
+    // Nesse caso, limpamos o restante da entrada para evitar problemas futuros.
+    if (strchr(texto, '\n') == NULL)
+    {
+        limpar_buffer();
+    }
+    else
+    {
+        // Se a entrada coube, apenas removemos o '\n' do final.
+        texto[strcspn(texto, "\n\r")] = 0;
     }
 
     for (int i = 0; i < 13; i++)
@@ -210,4 +224,103 @@ char *strcasestr(const char *haystack, const char *needle)
         }
     }
     return NULL;
+}
+
+struct tm get_data()
+{
+    time_t t = time(NULL);
+    return *localtime(&t);
+}
+
+const char *status_to_string(status s)
+{
+    switch (s)
+    {
+    case CONCLUIDO:
+        return "Concluído";
+    case EM_ANDAMENTO:
+        return "Em Andamento";
+    case CANCELADO:
+        return "Cancelado";
+    default:
+        return "Desconhecido";
+    }
+}
+
+const char *status_book_to_string(status_book sb)
+{
+    switch (sb)
+    {
+    case EMPRESTADO:
+        return "Emprestado";
+    case DISPONIVEL:
+        return "Disponível";
+    case INDISPONIVEL:
+        return "Indisponível";
+    default:
+        return "Desconhecido";
+    }
+}
+
+char *strptime(const char *s, const char *format, struct tm *tm)
+{
+    char *p = (char *)s;
+    while (*format)
+    {
+        if (*format == '%')
+        {
+            format++;
+            switch (*format)
+            {
+            case 'y':
+            {
+                int year = 0;
+                if (sscanf(p, "%2d", &year) == 1)
+                {
+                    tm->tm_year = year + 100; // Anos 2000
+                    p += 2;
+                }
+                else
+                    return NULL;
+                break;
+            }
+            case 'm':
+            {
+                if (sscanf(p, "%2d", &tm->tm_mon) == 1)
+                {
+                    tm->tm_mon--; // Mês é 0-11
+                    p += 2;
+                }
+                else
+                    return NULL;
+                break;
+            }
+            case 'd':
+            {
+                if (sscanf(p, "%2d", &tm->tm_mday) == 1)
+                {
+                    p += 2;
+                }
+                else
+                    return NULL;
+                break;
+            }
+            default:
+                return NULL;
+            }
+        }
+        else
+        {
+            if (*p == *format)
+            {
+                p++;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+        format++;
+    }
+    return p;
 }

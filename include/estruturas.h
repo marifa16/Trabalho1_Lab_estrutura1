@@ -29,6 +29,13 @@ typedef enum
     CANCELADO,
 } status;
 
+typedef enum
+{
+    EMPRESTADO,
+    DISPONIVEL,
+    INDISPONIVEL
+} status_book;
+
 typedef struct
 {
     int id;
@@ -36,6 +43,7 @@ typedef struct
     char autor[100];
     char ISBN[14];
     genero gen;
+    status_book stats_bk;
 } book;
 
 typedef struct

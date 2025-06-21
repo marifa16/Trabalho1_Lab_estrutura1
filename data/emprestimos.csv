@@ -1,1 +1,6 @@
-ID, LEITOR, LIVRO, DATA, STATS
+ID,LEITOR,LIVRO,DATA,STATS
+1,Ana Silva,2,25/05/15,1
+2,Bruno Costa,4,25/04/10,0
+3,Carlos Dias,6,25/05/20,24
+4,Ana Silva,4,25/06/21,0
+5,Ana Silva,6,25/06/21,1

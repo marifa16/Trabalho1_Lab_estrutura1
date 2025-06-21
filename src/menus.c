@@ -8,7 +8,9 @@
 #include "../include/menus.h"
 #include "../include/user_handle.h"
 #include "../include/book_manager.h"
+#include "../include/emprestimo_manager.h"
 #include "../include/auxiliar.h"
+#include "../include/relatorio.h"
 
 state temp_state;
 
@@ -157,6 +159,11 @@ state book_menu()
 
 state emprestimo_menu()
 {
+
+    emprestimo temp_emp;
+    emprestimo *ptr_emp = &temp_emp;
+    int escolha = 0;
+
     printf("===========================\n"
            "          Empréstimos      \n"
            "===========================\n"
@@ -168,27 +175,87 @@ state emprestimo_menu()
            "[5] - Sair\n"
            "===========================\n");
 
-    int escolha = opcao_menu(1, 5);
+    escolha = opcao_menu(1, 5);
 
     switch (escolha) // o estado atual é a saída de cada módulo do código
     {
-    case 1:
+    case 1: // registrar empréstimo
     {
+        printf("===========================\n"
+               "  Cadastro novo empréstimo    \n"
+               "===========================\n");
+        if (add_emp(ptr_emp) == 1)
+        {
+            create_emp(ptr_emp);
+            printf("\nEmpréstimo realizado com sucesso!\n");
+        }
         return EMPRESTIMO_MENU; // Permanece no módulo empréstimo
     }
-    case 2:
+    case 2: // devolver empréstimo
     {
+        int count = 0;
+
+        printf("===========================\n"
+               "       Devolver livro     \n"
+               "===========================\n");
+
+        emprestimo *emps = searching_emp(&count);
+
+        if (count > 0)
+        {
+            printf("\nDigite o ID do empréstimo que deseja devolver: ");
+            int id_emp = 0;
+            scanf(" %d", &id_emp);
+            limpar_buffer();
+            if (id_emp > 0)
+            {
+                emprestimo temp_emp = get_emp(id_emp);
+
+                if (temp_emp.id != -1)
+                {
+                    if (temp_emp.stats == CONCLUIDO)
+                    {
+                        printf("\nERRO: Este empréstimo já foi marcado como concluído.\n");
+                    }
+                    else if (upp_emp(&temp_emp) == 1) // upp_emp marca o empréstimo como CONCLUIDO
+                    {
+                        update_emp(id_emp, &temp_emp);
+
+                        book aux_book = get_book(temp_emp.livro.id);
+                        aux_book.stats_bk = DISPONIVEL;
+
+                        update_book(aux_book.id, &aux_book);
+                        printf("\nLivro devolvido e status atualizado para Disponível.\n");
+                    }
+                    else
+                    {
+                        printf("\nAtualização cancelada.\n");
+                    }
+                }
+                else
+                {
+                    printf("O empréstimo de id %d não encontrado\n", temp_emp.id);
+                }
+            }
+        }
+
+        free(emps); // libera os livros da função searching_book
+
         return EMPRESTIMO_MENU; // Permanece no módulo empréstimo
     }
-    case 3:
+    case 3: // lista empréstimos
     {
+        printf("=============================\n"
+               "Listar empréstimos por status\n"
+               "=============================\n");
+        list_emp_stats();
         return EMPRESTIMO_MENU; // Permanece no módulo empréstimo
     }
-    case 4:
+    case 4: // voltar
         return MAIN_MENU;
-    case 5:
+    case 5: // voltar
         return SAIR;
-    default:
+    default: // sair
     {
         printf("===========================\n"
                "Opção inválida.\n"
@@ -207,7 +274,7 @@ state relatorio_menu()
            "          Relatórios       \n"
            "===========================\n"
            "Opções disponíveis:\n\n"
-           "[1] - Listar livros por status\n"
+           "[1] - Listar livros por status do livro\n"
            "[2] - Listar livros por gênero\n"
            "[3] - Voltar\n"
            "[4] - Sair\n"
@@ -219,10 +286,12 @@ state relatorio_menu()
     {
     case 1:
     {
+        list_book_status();
         return RELATORIO_MENU; // módulo relatorios
     }
     case 2:
     {
+        list_book_genero();
         return RELATORIO_MENU; // módulo relatorios
     }
     case 3:

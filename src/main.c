@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <windows.h>
 
 #include "../include/estruturas.h"    // Inclui o cabeçalho das estruturas
 #include "../include/files_manager.h" // Inclui o cabeçalho do arquivo de gerenciamento de arquivos
@@ -8,7 +9,10 @@
 
 int main()
 {
-    setlocale(LC_ALL, "pt_BR.UTF-8"); // Configura o locale para português do Brasil com suporte a UTF-8
+    SetConsoleOutputCP(CP_UTF8); // Configura a saída do console para UTF-8
+    SetConsoleCP(CP_UTF8);       // Configura a entrada do console para UTF-8
+
+    setlocale(LC_ALL, ".UTF8"); // Configura o locale para português do Brasil com suporte a UTF-8
     state state_atual = MAIN_MENU;
 
     start_files();

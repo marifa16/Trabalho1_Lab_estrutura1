@@ -7,4 +7,8 @@ int add_book(book *temp_book);
 book *searching_book(int *count);
 int upp_book(book *temp_book);
 
+int add_emp(emprestimo *temp_emp);
+emprestimo *searching_emp(int *count);
+int upp_emp(emprestimo *temp_emp);
+
 #endif

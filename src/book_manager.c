@@ -13,6 +13,7 @@
 void create_book(book *temp_book)
 {
     int id = get_maior_id(books_file) + 1;
+    temp_book->stats_bk = DISPONIVEL;
 
     FILE *arquivo = fopen(books_file, "a"); // Abre o arquivo para adicionar no final
     if (arquivo == NULL)
@@ -21,48 +22,29 @@ void create_book(book *temp_book)
         return;
     }
 
-    fprintf(arquivo, "%d,%s,%s,%s,%d\n", id, temp_book->title, temp_book->autor, temp_book->ISBN, temp_book->gen); // Escreve o novo id                                                                                   // Nova linha
+    fprintf(arquivo, "%d,%s,%s,%s,%d,%d\n", id, temp_book->title, temp_book->autor, temp_book->ISBN, temp_book->gen, temp_book->stats_bk); // Escreve o novo id                                                                                   // Nova linha
     fclose(arquivo);
 }
 
 void read_book(int id)
 {
-    FILE *arquivo = fopen(books_file, "r"); // Abre o arquivo para adicionar no final
-    if (arquivo == NULL)
+    book temp_book = get_book(id);
+
+    if (temp_book.id != -1)
     {
-        printf("Erro ao abrir o arquivo '%s' para leitura.\n", books_file);
-        return;
+        printf("========================================\n");
+        printf("ID LIVRO : %d\n", temp_book.id);
+        printf("TITULO   : %s\n", temp_book.title);
+        printf("AUTOR    : %s\n", temp_book.autor);
+        printf("ISBN     : %s\n", temp_book.ISBN);
+        printf("GENERO   : %s\n", genero_to_string(temp_book.gen));
+        printf("STATUS   : %s\n", status_book_to_string(temp_book.stats_bk));
+        printf("========================================\n");
     }
-
-    char linha[512];
-    fgets(linha, sizeof(linha), arquivo);
-
-    while (fgets(linha, sizeof(linha), arquivo))
+    else
     {
-        book temp_book;
-        int genero_int;
-        // CORREÇÃO: Formato do sscanf para corresponder ao arquivo de livros
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d",
-                   &temp_book.id, temp_book.title, temp_book.autor, temp_book.ISBN, &genero_int) == 5)
-        {
-            if (temp_book.id == id)
-            {
-                temp_book.gen = (genero)genero_int;
-                printf("========================================\n");
-                printf("ID LIVRO : %d\n", temp_book.id);
-                printf("TITULO   : %s\n", temp_book.title);
-                printf("AUTOR    : %s\n", temp_book.autor);
-                printf("ISBN     : %s\n", temp_book.ISBN);
-                printf("GENERO   : %s\n", genero_to_string(temp_book.gen));
-                printf("========================================\n");
-                fclose(arquivo);
-                return;
-            }
-        }
+        printf("\nLivro com ID %d não encontrado!\n", id);
     }
-
-    printf("\nLivro não encontrado!\n");
-    fclose(arquivo);
 }
 
 void update_book(int id, book *temp_book)
@@ -97,9 +79,9 @@ void update_book(int id, book *temp_book)
         if (sscanf(linha, "%d,", &id_atual) == 1 && id_atual == id)
         {
             // Encontrou a linha para atualizar, escreve os novos dados
-            fprintf(temp, "%d,%s,%s,%s,%d\n",
+            fprintf(temp, "%d,%s,%s,%s,%d,%d\n",
                     temp_book->id, temp_book->title, temp_book->autor,
-                    temp_book->ISBN, temp_book->gen);
+                    temp_book->ISBN, temp_book->gen, temp_book->stats_bk);
             executado = 1;
         }
         else
@@ -201,13 +183,14 @@ book *search_books(int search_key, book *target_book, int *matchs)
     while (fgets(linha, sizeof(linha), arquivo))
     {
         book aux_book;
-        int genero_int;
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d",
-                   &aux_book.id, aux_book.title, aux_book.autor, aux_book.ISBN, &genero_int) != 5)
+        int genero_int, status_int;
+        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d,%d",
+                   &aux_book.id, aux_book.title, aux_book.autor, aux_book.ISBN, &genero_int, &status_int) != 6)
         {
             continue;
         }
         aux_book.gen = (genero)genero_int;
+        aux_book.stats_bk = (status_book)status_int;
 
         int found = 0;
         switch (search_key)
@@ -268,9 +251,10 @@ void view_books(book *books, int count)
     for (int i = 0; i < count; i++)
     {
         printf("----------------------------------------\n");
-        printf("  [%d] -> ID: %d\n", i + 1, books[i].id); // Mostra um índice para seleção
-        printf("        Título: %s\n", books[i].title);
-        printf("        Autor: %s\n", books[i].autor);
+        printf("  ID: %d\n", books[i].id);
+        printf("  Título: %s\n", books[i].title);
+        printf("  Autor: %s\n", books[i].autor);
+        printf("  Status: %s\n", status_book_to_string(books[i].stats_bk));
     }
     printf("----------------------------------------\n");
 }
@@ -290,13 +274,14 @@ book get_book(int id)
 
     while (fgets(linha, sizeof(linha), arquivo))
     {
-        int genero_int;
-        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d",
-                   &temp_book.id, temp_book.title, temp_book.autor, temp_book.ISBN, &genero_int) == 5)
+        int genero_int, status_int;
+        if (sscanf(linha, "%d,%99[^,],%99[^,],%13[^,],%d,%d",
+                   &temp_book.id, temp_book.title, temp_book.autor, temp_book.ISBN, &genero_int, &status_int) == 6)
         {
             if (temp_book.id == id)
             {
                 temp_book.gen = (genero)genero_int;
+                temp_book.stats_bk = (status_book)status_int;
                 fclose(arquivo);
                 return temp_book; // Retorna o livro encontrado
             }

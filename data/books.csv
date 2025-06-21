@@ -1,1 +1,8 @@
-ID, TITULO, AUTOR, ISBN, GENERO
+ID,TITULO,AUTOR,ISBN,GENERO,STATUS
+1,O Guia do Mochileiro das Galaxias,Douglas Adams,9788530600222,0,0
+2,Sapiens Uma Breve Historia da Humanidade,Yuval Noah Harari,9788535925272,2,0
+3,Algoritmos e Estruturas de Dados,Thomas H Cormen,9788535236993,1,1
+4,A Revolucao dos Bichos,George Orwell,9788535909555,0,1
+5,Steve Jobs,Walter Isaacson,9788535919714,2,2
+6,O Principe,Nicolau Maquiavel,9788525419872,0,0
+

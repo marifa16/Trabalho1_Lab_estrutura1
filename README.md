@@ -89,4 +89,4 @@ Este projeto utiliza um `Makefile` para automatizar o processo de compilação n
 ## Autores
 
 *   **Anderson Carlos da Silva Morais**
-*   **Marilia Fonseca
+*   **Marilia Fonseca**
